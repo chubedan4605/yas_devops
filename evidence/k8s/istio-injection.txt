@@ -1,0 +1,23 @@
+﻿NAME                              READY   STATUS    RESTARTS        AGE   IP            NODE           NOMINATED NODE   READINESS GATES
+backoffice-bff-68cc6c565f-btzxv   1/2     Running   2 (4m52s ago)   21m   10.244.0.57   minikube       <none>           <none>
+backoffice-bff-75cc4679f7-vrpxz   1/2     Running   5 (80s ago)     18m   10.244.0.71   minikube       <none>           <none>
+backoffice-ui-8bbdc54d7-2gpz9     2/2     Running   0               31m   10.244.1.28   minikube-m02   <none>           <none>
+cart-6647f8bcf5-nmhvh             1/2     Running   3 (5m15s ago)   22m   10.244.0.52   minikube       <none>           <none>
+cart-6bf74867b9-mzjff             1/2     Running   5 (93s ago)     18m   10.244.0.74   minikube       <none>           <none>
+customer-5d7dfcb7f9-2wlmf         2/2     Running   0               17m   10.244.1.39   minikube-m02   <none>           <none>
+dev-swagger-ui-6778f4dfdf-hh4ps   2/2     Running   0               31m   10.244.1.29   minikube-m02   <none>           <none>
+inventory-5d6659c5b8-vrtqh        1/2     Running   5 (73s ago)     18m   10.244.0.73   minikube       <none>           <none>
+inventory-7cb64dbcf4-wktrv        1/2     Running   3 (5m46s ago)   22m   10.244.0.55   minikube       <none>           <none>
+media-7f94fd5b6f-tdnf9            1/2     Running   2 (4m54s ago)   22m   10.244.0.54   minikube       <none>           <none>
+media-855c7476f5-vtzcr            1/2     Running   5 (81s ago)     18m   10.244.0.70   minikube       <none>           <none>
+order-5865987474-lzqjq            2/2     Running   0               17m   10.244.1.37   minikube-m02   <none>           <none>
+product-5955748cfb-g8r5m          2/2     Running   0               17m   10.244.1.38   minikube-m02   <none>           <none>
+sampledata-6775c787fc-pr5l6       1/2     Running   2 (5m10s ago)   21m   10.244.0.56   minikube       <none>           <none>
+sampledata-84fb47f65f-9rs7q       1/2     Running   5 (72s ago)     18m   10.244.0.72   minikube       <none>           <none>
+search-6f87557b89-58fwp           1/2     Running   5 (73s ago)     18m   10.244.0.75   minikube       <none>           <none>
+search-7d7b8d799f-dzvqc           1/2     Running   4 (5m29s ago)   22m   10.244.0.53   minikube       <none>           <none>
+storefront-bff-58f86456bc-kzd8p   1/2     Running   2 (5m1s ago)    21m   10.244.0.58   minikube       <none>           <none>
+storefront-bff-6bcff5c877-4t266   1/2     Running   5 (80s ago)     18m   10.244.0.76   minikube       <none>           <none>
+storefront-ui-55c4479fdf-qlcxr    2/2     Running   0               31m   10.244.1.30   minikube-m02   <none>           <none>
+tax-56b8868b49-wb8hf              2/2     Running   2 (14m ago)     17m   10.244.1.40   minikube-m02   <none>           <none>
+yas-reloader-74749cc667-69l2q     2/2     Running   0               31m   10.244.1.31   minikube-m02   <none>           <none>

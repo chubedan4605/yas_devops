@@ -21,6 +21,7 @@ if (-not $pods) {
 Write-Host ">>> Starting FULL HTTP port-80 traffic simulation using main application containers for ${DurationSeconds} seconds..." -ForegroundColor Cyan
 
 function Exec-Wget($sourceApp, $destUrl) {
+    if ($sourceApp -eq 'dev-swagger-ui') { $sourceApp = 'swagger-ui' }
     # Find the pod name
     $pod = kubectl get pod -l "app.kubernetes.io/name=$sourceApp" -n $Namespace --no-headers 2>$null | 
         Select-Object -First 1 | ForEach-Object { ($_ -split '\s+')[0] }
@@ -94,3 +95,4 @@ while (((Get-Date) - $startTime).TotalSeconds -lt $DurationSeconds) {
 }
 
 Write-Host ">>> Traffic simulation complete!" -ForegroundColor Green
+
