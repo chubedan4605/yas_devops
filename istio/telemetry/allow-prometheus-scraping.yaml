@@ -1,0 +1,23 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-prometheus-scraping
+  namespace: dev
+spec:
+  rules:
+    - to:
+        - operation:
+            ports:
+              - "8090"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-prometheus-scraping
+  namespace: staging
+spec:
+  rules:
+    - to:
+        - operation:
+            ports:
+              - "8090"

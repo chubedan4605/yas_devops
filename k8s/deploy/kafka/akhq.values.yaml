@@ -1,0 +1,23 @@
+configuration:
+  akhq:
+    connections:
+      kafka-connection:
+        connect:
+        - name: debezium-connect-cluster
+          url: http://debezium-connect-cluster-connect-api:8083
+        properties:
+          bootstrap.servers: kafka-cluster-kafka-bootstrap:9092
+    server:
+      access-log:
+        enabled: false
+        name: org.akhq.log.access
+hostname: akhq.yas.local.com
+ingress:
+  annotations: {}
+  enabled: true
+  hosts:
+  - akhq.yas.local.com
+  ingressClassName: traefik
+  paths:
+  - /
+  tls: []

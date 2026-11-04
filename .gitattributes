@@ -1,0 +1,8 @@
+# fix line ending
+* text=auto
+
+# Shell scripts must always use LF (Unix line endings)
+*.sh text eol=lf
+
+# Jenkinsfile must use LF
+Jenkinsfile* text eol=lf

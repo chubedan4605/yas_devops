@@ -1,0 +1,45 @@
+affinity: {}
+autoscaling:
+  enabled: false
+  maxReplicas: 100
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+fullnameOverride: ''
+hostname: pgadmin.yas.local.com
+image:
+  pullPolicy: IfNotPresent
+  repository: dpage/pgadmin4
+  tag: '7.3'
+imagePullSecrets: []
+ingress:
+  annotations: {}
+  className: traefik
+  enabled: true
+  hosts:
+  - host: pgadmin.yas.local.com
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: []
+nameOverride: ''
+nodeSelector: {}
+persistence:
+  accessMode: ReadWriteOnce
+  enabled: true
+  size: 2Gi
+pgadmin:
+  password: admin
+  user: admin@yas.com
+podAnnotations: {}
+podSecurityContext: {}
+replicaCount: 1
+resources: {}
+securityContext: {}
+service:
+  port: 80
+  type: ClusterIP
+serviceAccount:
+  annotations: {}
+  create: true
+  name: ''
+tolerations: []

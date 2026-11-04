@@ -1,0 +1,109 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: postgres-disable-mtls-short
+  namespace: dev
+spec:
+  host: "postgresql.postgres"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: redis-disable-mtls-short
+  namespace: dev
+spec:
+  host: "redis-master.redis"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: kafka-disable-mtls-short
+  namespace: dev
+spec:
+  host: "kafka-cluster-kafka-brokers.kafka"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: keycloak-disable-mtls-short
+  namespace: dev
+spec:
+  host: "keycloak-service.keycloak"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: elasticsearch-disable-mtls-short
+  namespace: dev
+spec:
+  host: "elasticsearch-es-http.elasticsearch"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: postgres-disable-mtls-short
+  namespace: staging
+spec:
+  host: "postgresql.postgres"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: redis-disable-mtls-short
+  namespace: staging
+spec:
+  host: "redis-master.redis"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: kafka-disable-mtls-short
+  namespace: staging
+spec:
+  host: "kafka-cluster-kafka-brokers.kafka"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: keycloak-disable-mtls-short
+  namespace: staging
+spec:
+  host: "keycloak-service.keycloak"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: elasticsearch-disable-mtls-short
+  namespace: staging
+spec:
+  host: "elasticsearch-es-http.elasticsearch"
+  trafficPolicy:
+    tls:
+      mode: DISABLE

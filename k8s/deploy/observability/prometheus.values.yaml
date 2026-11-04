@@ -1,0 +1,76 @@
+grafana:
+  adminPassword: admin
+  adminUser: admin
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 50m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+  grafana.ini:
+    database:
+      host: 10.42.0.66:5432
+      name: grafana
+      password: admin
+      ssl_mode: require
+      type: postgres
+      user: yasadminuser
+    auth.basic:
+      enabled: true
+    security:
+      admin_user: admin
+      admin_password: admin
+    auth:
+      login_maximum_inactive_lifetime_days: 7
+      login_maximum_lifetime_days: 30
+      disable_login_form: false
+    users:
+      allow_sign_up: false
+    auth.anonymous:
+      enabled: false
+  additionalDataSources:
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    access: proxy
+    url: http://tempo:3200
+    jsonData:
+      httpMethod: GET
+      tracesToLogsV2:
+        datasourceUid: loki
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      lokiSearch:
+        datasourceUid: loki
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+      - datasourceUid: tempo
+        matcherRegex: traceId=(\w*)
+        name: traceId
+        url: ${__value.raw}
+  ingress:
+    enabled: true
+    hosts:
+    - grafana.yas.local.com
+    ingressClassName: traefik
+  nodeSelector:
+    type: heavy
+hostname: grafana.yas.local.com
+nodeExporter:
+  enabled: false
+prometheus:
+  prometheusSpec:
+    enableRemoteWriteReceiver: true
+    nodeSelector:
+      type: heavy

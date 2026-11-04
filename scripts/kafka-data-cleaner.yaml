@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kafka-data-cleaner
+  namespace: kafka
+spec:
+  restartPolicy: Never
+  volumes:
+    - name: kafka-data
+      persistentVolumeClaim:
+        claimName: data-0-kafka-cluster-kafka-0
+  containers:
+    - name: cleaner
+      image: busybox
+      command:
+        - sh
+        - -c
+        - |
+          echo "=== Files in /data ==="
+          ls /data/
+          echo "=== Removing meta.properties ==="
+          rm -f /data/kafka-log0/meta.properties
+          echo "DONE - meta.properties removed"
+      volumeMounts:
+        - name: kafka-data
+          mountPath: /data

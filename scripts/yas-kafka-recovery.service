@@ -1,0 +1,16 @@
+[Unit]
+Description=YAS Kafka Recovery - Auto-fix Kafka/Zookeeper after boot
+After=k3s.service
+Requires=k3s.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /mnt/f/Devops/yas/scripts/restart-after-boot.sh
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+# Cho K3s 30s de khoi dong truoc khi chay script
+ExecStartPre=/bin/sleep 30
+
+[Install]
+WantedBy=multi-user.target

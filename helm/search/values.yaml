@@ -1,0 +1,31 @@
+backend:
+  podAnnotations:
+    traffic.sidecar.istio.io/excludeOutboundPorts: "5432,6379,5672"
+  image:
+    repository: ghcr.io/nashtech-garage/yas-search
+    tag: latest
+
+  nameOverride: search
+  fullnameOverride: search
+  databaseName: search
+  ingress:
+    enabled: false
+  extraEnvs:
+    - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_ELASTICSEARCH_CLIENT_WIRE
+      value: "TRACE"
+    - name: LOGGING_LEVEL_ORG_APACHE_HC
+      value: "DEBUG"
+    - name: JAVA_TOOL_OPTIONS
+      value: "-Dhttp.protocols=http/1.1 -Dorg.apache.hc.client5.http.force-http1=true"
+  extraEnvFroms:
+    - secretRef:
+        name: yas-elasticsearch-credentials-secret
+  extraVolumes:
+    - name: search-application
+      configMap:
+        name: search-application-configmap
+  extraVolumeMounts:
+    - name: search-application
+      mountPath: /opt/yas/search
+  extraApplicationConfigPaths:
+    - /opt/yas/search/search-application.yaml

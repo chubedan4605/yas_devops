@@ -1,0 +1,54 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: postgres-disable-mtls-infra
+  namespace: postgres
+spec:
+  host: "postgresql"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: redis-disable-mtls-infra
+  namespace: redis
+spec:
+  host: "redis-master"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: kafka-disable-mtls-infra
+  namespace: kafka
+spec:
+  host: "*.kafka"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: keycloak-disable-mtls-infra
+  namespace: keycloak
+spec:
+  host: "keycloak-service"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: elasticsearch-disable-mtls-infra
+  namespace: elasticsearch
+spec:
+  host: "elasticsearch-es-http"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
