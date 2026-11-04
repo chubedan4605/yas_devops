@@ -7,8 +7,14 @@ metadata:
     team: acid
 
 spec:
-  nodeSelector:
-    type: heavy
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: type
+              operator: In
+              values:
+                - heavy
   streams:
     - applicationId: product_db_stream_appid
       database: product

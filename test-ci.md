@@ -45,13 +45,13 @@ Using commit tag: <commit_id_8_ky_tu>
 - Docker push:
 
 ```
-docker push besukem/tax:<commit_id_8_ky_tu>
+docker push chubedan4605/tax:<commit_id_8_ky_tu>
 ```
 
 ### Bước 6. Kiểm tra Docker Hub
 
-- Đăng nhập Docker Hub (tài khoản `besukem`).
-- Mở repository `besukem/tax`.
+- Đăng nhập Docker Hub (tài khoản `chubedan4605`).
+- Mở repository `chubedan4605/tax`.
 - Chụp ảnh tag mới trùng với Commit ID.
 
 ---
@@ -108,13 +108,13 @@ Tag: latest
 ```
 Service tax
 Image:
-besukem/tax:<commit_id>
+chubedan4605/tax:<commit_id>
 ```
 
 ```
 Service cart
 Image:
-besukem/cart:latest
+chubedan4605/cart:latest
 ```
 
 ---

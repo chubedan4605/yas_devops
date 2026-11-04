@@ -1,130 +1,131 @@
-Mình sẽ đưa cho bạn một bộ test end-to-end theo dạng checklist chấm điểm, gồm từng case cụ thể, lệnh thao tác, expected log và bằng chứng cần chụp để chứng minh pass Task 2 khi demo.Để pass Task 2 chắc chắn, bạn nên test theo bộ 7 case dưới đây và lưu bằng chứng cho từng case.
+Ran check storageClass requirements
+Ran read k8s/namespaces.yaml
+Ran read cluster-config.yaml
+Analyzed run-yas-setup.ps1:L80-180
+Analyzed run-yas-setup.ps1:L181-300
 
-Phần pipeline đang cần verify nằm ở Jenkinsfile, Jenkinsfile, Jenkinsfile, Jenkinsfile, Jenkinsfile.
+Tuyệt vời! Trong lúc chờ lệnh `minikube start --nodes 2 --memory 12288 --cpus 4` tải image và khởi động cụm xong (mất khoảng 2–4 phút), đây là **toàn bộ lộ trình các bước tiếp theo** để bạn thiết lập hoàn chỉnh hệ thống:
 
-Lưu ý trước khi test:
+---
 
-1. Project dùng Java 25 ở pom.xml, còn Jenkins tool đang là jdk21 ở Jenkinsfile. Nếu không đồng bộ JDK, bạn fail do build chứ không phải fail logic Task 2.
-2. Bạn đang có git add toàn bộ. Nên tách branch test riêng để dễ kiểm soát bằng chứng.
+### BƯỚC 1: Kiểm tra Cụm 2 Node & Bật Addon thiết yếu
+Ngay khi lệnh `minikube start` hoàn tất và trả về dấu nhắc lệnh, bạn gõ:
 
-Kịch bản test chuẩn để pass task
+```powershell
+# 1. Kiểm tra 2 node đã Ready chưa
+kubectl get nodes
 
-1. Chuẩn bị branch test
-   Chạy:
-   git checkout -b test/task2-jenkins
-   git status
-   Kết quả mong đợi:
-   - Working tree sạch hoặc chỉ chứa thay đổi bạn muốn test.
+# 2. Bật Ingress Controller và Metrics Server của Minikube
+minikube addons enable ingress
+minikube addons enable metrics-server
+```
+*(Bạn sẽ thấy 2 node: `minikube` đóng vai trò Master/Control-plane và `minikube-m02` đóng vai trò Worker).*
 
-2. Case A: Không có thay đổi service thì skip build
-   Mục tiêu:
-   - CHANGED_SERVICES là none.
-   - Stage Build không chạy.
-     Cách làm:
-     git checkout main
-     git checkout -b test/task2-none
-     echo "task2 none test" >> README.md
-     git add README.md
-     git commit -m "test: docs only"
-     git push -u origin test/task2-none
-     Kết quả mong đợi trên Jenkins:
-   - Có log No service changes detected. Skipping build/test.
-   - Build Phase bị skip.
-     Bằng chứng:
-   - Ảnh log detect stage.
-   - Ảnh stage view cho thấy Build skipped.
+---
 
-3. Case B: Chỉ đổi 1 service thì chỉ build 1 service
-   Mục tiêu:
-   - Chỉ có 1 service trong Services to build/test.
-   - Chỉ có 1 vòng lặp Building.
-     Cách làm ví dụ với product:
-     git checkout -b test/task2-product-only
-     echo "// task2 single service test" >> ProductApplication.java
-     git add ProductApplication.java
-     git commit -m "test: product only change"
-     git push -u origin test/task2-product-only
-     Kết quả mong đợi:
-   - Log có Services to build/test: product.
-   - Log có Building: product.
-   - Không có Building của service khác.
-   - Có artifact của product trong Archived Artifacts.
-     Bằng chứng:
-   - Ảnh log detect.
-   - Ảnh log build.
-   - Ảnh archived artifact.
+### BƯỚC 2: Gỡ Taint và Gán nhãn cho 2 Node (Bắt buộc)
+Các Helm chart của dự án phân chia tải: Pod nặng (Database, Kafka, Backend) chạy trên node `type=heavy`, Pod giao diện nhẹ (UI) chạy trên node `type=light`.
 
-4. Case C: Đổi 2 service thì chỉ build đúng 2 service
-   Cách làm:
-   git checkout -b test/task2-two-services
-   echo "// task2 multi service test" >> ProductApplication.java
-   echo "// task2 multi service test" >> OrderApplication.java
-   git add ProductApplication.java OrderApplication.java
-   git commit -m "test: product and order change"
-   git push -u origin test/task2-two-services
-   Kết quả mong đợi:
-   - Services to build/test chứa product,order.
-   - Build chỉ có product và order.
-   - Artifact chỉ xuất hiện cho 2 service này.
-     Bằng chứng:
-   - Ảnh log detect và build.
-   - Ảnh archived artifact.
+Chạy các lệnh sau:
+```powershell
+# Cho phép Node Master nhận chạy pod ứng dụng (gỡ NoSchedule)
+kubectl taint nodes minikube node-role.kubernetes.io/control-plane:NoSchedule- 2>$null
+kubectl taint nodes minikube node-role.kubernetes.io/master:NoSchedule- 2>$null
 
-5. Case D: Đổi file nền tảng thì build all services
-   Rule này nằm ở Jenkinsfile.
-   Cách làm:
-   git checkout -b test/task2-build-all
-   echo "<!-- task2 build all test -->" >> pom.xml
-   git add pom.xml
-   git commit -m "test: root pom change"
-   git push -u origin test/task2-build-all
-   Kết quả mong đợi:
-   - Services to build/test là danh sách allBuildableServices.
-   - Build lặp qua toàn bộ service backend.
-     Bằng chứng:
-   - Ảnh log detect thể hiện danh sách dài.
-   - Ảnh log build nhiều service.
+# Gán nhãn cho Master là 'heavy', Worker là 'light'
+kubectl label node minikube type=heavy --overwrite
+kubectl label node minikube-m02 type=light --overwrite
+```
 
-6. Case E: Verify artifact cho Maven và Gradle path
-   Mục tiêu:
-   - Archive đúng pattern tại Jenkinsfile.
-     Kiểm tra:
-   - target/_.jar hoặc target/_.war xuất hiện cho Maven service.
-   - Nếu có Gradle service thì build/libs/_.jar hoặc _.war.
-     Bằng chứng:
-   - Ảnh trang Archived Artifacts.
+---
 
-7. Case F: Verify đường script của anh Lộc hoạt động
-   Pipeline ưu tiên script ở Jenkinsfile.
-   Vì repo hiện chưa có file scripts detect chính thức, bạn test theo 2 bước:
-   1. Chưa có script:
-   - Jenkins dùng fallback git diff.
-   2. Có script:
-   - Tạo scripts/detect-changed-services.sh và cho script echo ra 3 mode để thử:
-     - none
-     - all
-     - product,order
-       Kết quả mong đợi:
-   - Log có Detect script output.
-   - CHANGED_SERVICES đúng theo output script.
-     Bằng chứng:
-   - Ảnh log từng mode.
+### BƯỚC 3: Lấy IP Minikube và cập nhật file `hosts`
+1. Lấy địa chỉ IP của Minikube:
+   ```powershell
+   minikube ip
+   ```
+   *(Thường sẽ in ra IP dạng `192.168.49.2`)*.
 
-Checklist chấm pass Task 2
+2. Mở file `C:\Windows\System32\drivers\etc\hosts` bằng **Notepad (Run as Administrator)** và thêm đoạn sau vào cuối file (thay `192.168.49.2` bằng IP thực tế vừa in ra):
+   ```text
+   192.168.49.2  api.yas.local
+   192.168.49.2  storefront.yas.local
+   192.168.49.2  backoffice.yas.local
+   192.168.49.2  identity.yas.local.com
+   192.168.49.2  grafana.yas.local.com
+   192.168.49.2  kiali.yas.local.com
+   192.168.49.2  argocd.yas.local.com
+   ```
+   Lưu file lại (`Ctrl + S`).
 
-1. Có ít nhất 1 case skip hoàn toàn Build Phase.
-2. Có case build 1 service và không build service khác.
-3. Có case build nhiều service đúng theo diff.
-4. Có case build all khi đổi file nền tảng.
-5. Có archived artifacts đúng service đã build.
-6. Có bằng chứng script mode và fallback mode đều chạy đúng.
+---
 
-Bộ bằng chứng nên nộp
+### BƯỚC 4: Tạo các Namespace dự án
+```powershell
+kubectl apply -f k8s/namespaces.yaml
+```
+*Lệnh này sẽ tạo sẵn các namespace `dev`, `staging`, `developer-sandbox` và bật sẵn cờ tự động gắn sidecar `istio-injection: enabled`.*
 
-1. Ảnh Stage View cho 4 case chính: none, one, multi, all.
-2. Ảnh log đoạn Services to build/test.
-3. Ảnh log đoạn Building.
-4. Ảnh Archived Artifacts.
-5. Link commit/branch của từng case test.
+---
 
-Nếu bạn muốn, mình có thể viết luôn một file test plan dạng markdown trong repo để bạn nộp trực tiếp cho giảng viên, gồm template kết quả Pass/Fail cho từng case.
+### BƯỚC 5: Cài đặt Hạ tầng nền tảng (Database, Keycloak, Kafka, ArgoCD, Istio)
+Thêm các kho Helm cần thiết:
+```powershell
+helm repo add postgres-operator-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator
+helm repo add strimzi https://strimzi.io/charts/
+helm repo add akhq https://akhq.io/
+helm repo add elastic https://helm.elastic.co
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add stakater https://stakater.github.io/stakater-charts
+helm repo update
+```
+
+Sau đó cài đặt lần lượt:
+```powershell
+# 1. Cài Redis
+helm upgrade --install redis bitnami/redis --create-namespace --namespace redis --set auth.password="redis"
+
+# 2. Cài Postgres Operator & Postgres Database
+helm upgrade --install postgres-operator postgres-operator-charts/postgres-operator --create-namespace --namespace postgres
+Start-Sleep -Seconds 15
+helm upgrade --install postgres k8s/deploy/postgres/postgresql --create-namespace --namespace postgres --set replicas=1 --set username="yasadminuser" --set password="admin"
+
+# 3. Cài Keycloak Operator & Keycloak
+kubectl create namespace keycloak 2>$null
+kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/26.0.2/kubernetes/keycloaks.k8s.keycloak.org-v1.yml
+kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/26.0.2/kubernetes/keycloakrealmimports.k8s.keycloak.org-v1.yml
+kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/26.0.2/kubernetes/kubernetes.yml -n keycloak
+helm upgrade --install keycloak k8s/deploy/keycloak/keycloak --namespace keycloak --set hostname="identity.yas.local.com" --set postgresql.username="yasadminuser" --set postgresql.password="admin"
+
+# 4. Cài Kafka (Strimzi)
+helm upgrade --install kafka-operator strimzi/strimzi-kafka-operator --create-namespace --namespace kafka --version 0.43.0
+Start-Sleep -Seconds 20
+helm upgrade --install kafka-cluster k8s/deploy/kafka/kafka-cluster --create-namespace --namespace kafka --set kafka.replicas=1 --set zookeeper.replicas=1
+
+# 5. Cài ArgoCD & Bootstrap GitOps
+kubectl create namespace argocd 2>$null
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.12.0/manifests/install.yaml
+kubectl apply -f argocd/yas-dev-bootstrap.yaml
+kubectl apply -f argocd/yas-staging-bootstrap.yaml
+```
+
+---
+
+### BƯỚC 6: Khởi chạy Jenkins CI/CD
+1. Lấy file Kubeconfig của Minikube copy vào Jenkins:
+   ```powershell
+   Copy-Item "$env:USERPROFILE\.kube\config" "docker-jenkins\kubeconfig-docker" -Force
+   ```
+2. Khởi động container Jenkins:
+   ```powershell
+   cd docker-jenkins
+   docker compose up -d --build
+   cd ..
+   ```
+3. Mở trình duyệt vào **`http://localhost:8899`**, thêm 2 credentials:
+   * **`github-credentials`**: GitHub Username + Personal Access Token.
+   * **`dockerhub-credentials`**: `chubedan4605` + Mật khẩu/Token Docker Hub.
+
+---
+
+Khi lệnh `minikube start` chạy xong, bạn cứ chạy tiếp **BƯỚC 1 và BƯỚC 2**. Nếu có bất kỳ thông báo gì trên màn hình, hãy dán vào đây mình sẽ hướng dẫn tiếp nhé!
